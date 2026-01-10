@@ -2,7 +2,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div>
+    <div className="container mx-auto p-4 max-w-4xl text-white">
       Home-Page
     </div>
   )
