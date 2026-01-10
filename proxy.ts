@@ -7,11 +7,13 @@ const isPublicRoute = createRouteMatcher([
    "/",
    "/home",
    "/social-share(.*)",
+   "/video-upload(.*)"
 ])
 
 const isPublicApiRoute = createRouteMatcher([
   "/api/video",
-  "/api/Image-upload"
+  "/api/Image-upload",
+  "/api/video-upload"
 ])
 
 
