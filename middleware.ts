@@ -1,30 +1,24 @@
-import { auth, clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server';
 
 const isPublicRoute = createRouteMatcher([
    "/sign-in(.*)",
    "/sign-up(.*)",
    "/",
-   "/home",
-   "/social-share(.*)",
-   "/video-upload(.*)"
 ])
 
 const isPublicApiRoute = createRouteMatcher([
-  "/api/video",
-  "/api/Image-upload",
-  "/api/video-upload"
+  "/api/video"
 ])
 
 
 export default clerkMiddleware(async (authData, req) => {
   const { userId } = await authData();
   const currentUrl = new URL(req.url)
-  const isHomePage = currentUrl.pathname === "/home"
   const isApiRequest = currentUrl.pathname.startsWith("/api")
 
-  // Redirect authenticated users from public routes to home
-  if (userId && isPublicRoute(req) && !isHomePage) {
+  // Redirect authenticated users from landing page and auth pages to home
+  if (userId && (currentUrl.pathname === "/" || currentUrl.pathname.startsWith("/sign-in") || currentUrl.pathname.startsWith("/sign-up"))) {
     return NextResponse.redirect(new URL("/home", req.url))
   }
 

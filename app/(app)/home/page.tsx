@@ -3,7 +3,7 @@ import React, {useState, useCallback, useEffect} from 'react'
 import axios from 'axios'
 import VideoCard from '@/components/videoCard'
 import {Video} from '@/types/index'
-const page = () => {
+const HomePage = () => {
 
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
@@ -11,7 +11,7 @@ const page = () => {
 
   const fetchVideos = useCallback(async () => {
       try {
-       const response = await axios.get(('/api/videos'));
+       const response = await axios.get(('/api/video'));
        if(Array.isArray(response.data)){
           setVideos(response.data);
        }else{
@@ -59,6 +59,7 @@ const page = () => {
                 videos.map((video) => (
                     <VideoCard
                         key={video.id}
+                        publicId={video.publicId}
                         video={video}
                         onDownload={handleDownload}
                     />
@@ -70,4 +71,4 @@ const page = () => {
   )
 }
 
-export default page
+export default HomePage
