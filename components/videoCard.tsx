@@ -1,10 +1,11 @@
 import React,{ useState, useEffect, useCallback} from 'react'
 import { getCldImageUrl, getCldVideoUrl } from 'next-cloudinary'
-import {Download, Clock, FileDown, FileUp, Trash2} from 'lucide-react'
+import {Download, Clock, FileDown, FileUp, Trash2, Subtitles, Play} from 'lucide-react'
 import dayjs from 'dayjs'
 import realtivetime from 'dayjs/plugin/relativeTime'
 import {filesize} from 'filesize'
-import { Video } from '@/app/generated/prisma/browser'
+import { Video } from '@/types'
+import VideoPlayer from './VideoPlayer'
 
 dayjs.extend(realtivetime)
 
@@ -13,14 +14,17 @@ interface VideoCardProps {
     video: Video;
     onDownload: (url: string, title: string) => void;
     onDelete: (id: string) => void;
+    onGenerateSubtitles: (videoId: string, publicId: string) => void;
     isDeleting?: boolean;
+    isGeneratingSubtitles?: boolean;
 }
 
 
-const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, isDeleting = false})  => {
+const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGenerateSubtitles, isDeleting = false, isGeneratingSubtitles = false})  => {
    
     const [isHovered, setIsHovered] = useState(false);
     const [previewError, setPreviewError] = useState(false);
+    const [showVideoModal, setShowVideoModal] = useState(false);
 
     const getThumbnailUrl = useCallback((publicId: string) =>{
           return getCldImageUrl({
@@ -75,6 +79,7 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, isDe
       };
 
   return (
+      <>
       <div
           className={`card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
           onMouseEnter={() => setIsHovered(true)}
@@ -138,18 +143,40 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, isDe
                 <span className="text-accent">{compressionPercentage}%</span>
               </div>
               <div className="flex gap-2">
+                {video.hasSubtitles && (
+                  <button
+                    className="btn btn-info btn-sm"
+                    onClick={() => setShowVideoModal(true)}
+                    title="Watch with subtitles"
+                  >
+                    <Play size={16} />
+                  </button>
+                )}
                 <button
                   className="btn btn-primary btn-sm"
                   onClick={() =>
                     onDownload(getFullVideoUrl(video.publicId), video.title)
                   }
+                  disabled={isDeleting || isGeneratingSubtitles}
                 >
                   <Download size={16} />
                 </button>
                 <button
+                  className={`btn btn-sm ${video.hasSubtitles ? 'btn-success' : 'btn-secondary'}`}
+                  onClick={() => onGenerateSubtitles(video.id, video.publicId)}
+                  disabled={isDeleting || isGeneratingSubtitles}
+                  title={video.hasSubtitles ? 'Subtitles available' : 'Generate subtitles'}
+                >
+                  {isGeneratingSubtitles ? (
+                    <span className="loading loading-spinner loading-xs"></span>
+                  ) : (
+                    <Subtitles size={16} />
+                  )}
+                </button>
+                <button
                   className="btn btn-error btn-sm"
                   onClick={() => onDelete(video.id)}
-                  disabled={isDeleting}
+                  disabled={isDeleting || isGeneratingSubtitles}
                 >
                   {isDeleting ? (
                     <span className="loading loading-spinner loading-xs"></span>
@@ -161,6 +188,26 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, isDe
             </div>
           </div>
         </div>
+
+        {showVideoModal && (
+          <div className="modal modal-open" onClick={() => setShowVideoModal(false)}>
+            <div className="modal-box max-w-4xl" onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-bold text-lg mb-4">{video.title}</h3>
+              <VideoPlayer
+                publicId={video.publicId}
+                title={video.title}
+                subtitleUrl={video.subtitles}
+                autoPlay={true}
+              />
+              <div className="modal-action">
+                <button className="btn" onClick={() => setShowVideoModal(false)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
   )
 }
 

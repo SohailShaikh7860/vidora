@@ -9,6 +9,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [generatingSubtitlesId, setGeneratingSubtitlesId] = useState<string | null>(null);
 
   const fetchVideos = useCallback(async () => {
       try {
@@ -45,7 +46,7 @@ const HomePage = () => {
             return;
         }
 
-        setDeletingId(id); // Set loading state
+        setDeletingId(id);
 
         try {
             const response = await axios.delete(`/api/video-delete?id=${id}`);
@@ -59,6 +60,49 @@ const HomePage = () => {
             alert('Failed to delete video. Please try again.');
         } finally {
             setDeletingId(null);
+        }
+    }, [])
+
+    const handleGenerateSubtitles = useCallback(async (videoId: string, publicId: string) => {
+        if (!confirm('Generate subtitles for this video? This may take a few minutes.')) {
+            return;
+        }
+
+        setGeneratingSubtitlesId(videoId);
+
+        try {
+            const response = await axios.post('/api/subtitle-generator', {
+                videoId,
+                publicId
+            });
+
+            if (response.data.success) {
+                
+                setVideos(prevVideos => 
+                    prevVideos.map(video => 
+                        video.id === videoId 
+                            ? { ...video, hasSubtitles: true, subtitles: response.data.subtitles }
+                            : video
+                    )
+                );
+                
+                const blob = new Blob([response.data.subtitles], { type: 'text/vtt' });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${publicId}-subtitles.vtt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+
+                alert('Subtitles generated and downloaded successfully!');
+            }
+        } catch (error) {
+            console.error('Subtitle generation error:', error);
+            alert('Failed to generate subtitles. Please try again.');
+        } finally {
+            setGeneratingSubtitlesId(null);
         }
     }, [])
 
@@ -82,7 +126,9 @@ const HomePage = () => {
                         video={video}
                         onDownload={handleDownload}
                         onDelete={handleDelete}
+                        onGenerateSubtitles={handleGenerateSubtitles}
                         isDeleting={deletingId === video.id}
+                        isGeneratingSubtitles={generatingSubtitlesId === video.id}
                     />
                 ))
               }

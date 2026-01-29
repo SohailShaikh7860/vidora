@@ -51,24 +51,41 @@ export async function POST(request: NextRequest) {
     const transcription = await openai.audio.transcriptions.create({
       file: videoFile,
       model: "whisper-1",
-      response_format: "srt",
+      response_format: "vtt",
       language: "en",
     });
 
 
+    
+    const subtitleUpload = await new Promise<any>((resolve, reject) => {
+      cloudinary.uploader.upload_stream(
+        {
+          resource_type: "raw",
+          folder: "video-subtitles",
+          public_id: `${publicId}-subtitles`,
+          format: "vtt",
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      ).end(Buffer.from(transcription, 'utf-8'));
+    });
+
     await prisma.video.update({
       where: { id: videoId },
       data: {
-        subtitles: transcription,
+        subtitles: subtitleUpload.secure_url,
         hasSubtitles: true,
-        subtitleFormat: "srt",
+        subtitleFormat: "vtt",
       },
     });
 
     return NextResponse.json({
       success: true,
       subtitles: transcription,
-      message: "Subtitles generated successfully",
+      subtitleUrl: subtitleUpload.secure_url,
+      message: "Subtitles generated and uploaded successfully",
     }, {status: 201});
     
   } catch (error) {
