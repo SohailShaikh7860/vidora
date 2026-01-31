@@ -31,14 +31,51 @@ const HomePage = () => {
      fetchVideos();
   },[fetchVideos])
 
-   const handleDownload = useCallback((url: string, title: string) => {
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", `${title}.mp4`);
-        link.setAttribute("target", "_blank");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+   const handleDownload = useCallback(async (url: string, title: string, subtitles?: string | null) => {
+        console.log('📥 Download clicked - Opening video in new tab + downloading subtitles');
+        
+        try {
+            window.open(url, '_blank');
+            
+            if (subtitles) {
+               
+                setTimeout(async () => {
+                    try {
+                        if (subtitles.startsWith('http')) {
+                            
+                            const subResponse = await fetch(subtitles);
+                            const subBlob = await subResponse.blob();
+                            const subBlobUrl = window.URL.createObjectURL(subBlob);
+                            
+                            const link = document.createElement("a");
+                            link.href = subBlobUrl;
+                            link.download = `${title}-subtitles.vtt`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(subBlobUrl);
+                           
+                        } else {
+                            
+                            const blob = new Blob([subtitles], { type: 'text/vtt' });
+                            const blobUrl = window.URL.createObjectURL(blob);
+                            const link = document.createElement('a');
+                            link.href = blobUrl;
+                            link.download = `${title}-subtitles.vtt`;
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                            window.URL.revokeObjectURL(blobUrl);
+                        
+                        }
+                    } catch (err) {
+                        console.error('❌ Subtitle download error:', err);
+                    }
+                }, 500);
+            }
+        } catch (error) {
+            console.error('❌ Error:', error);
+        }
     }, [])
 
     const handleDelete = useCallback(async (id: string) => {
@@ -85,18 +122,8 @@ const HomePage = () => {
                             : video
                     )
                 );
-                
-                const blob = new Blob([response.data.subtitles], { type: 'text/vtt' });
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = `${publicId}-subtitles.vtt`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                window.URL.revokeObjectURL(url);
 
-                alert('Subtitles generated and downloaded successfully!');
+                alert('Subtitles generated successfully!');
             }
         } catch (error) {
             console.error('Subtitle generation error:', error);

@@ -1,6 +1,6 @@
 import React,{ useState, useEffect, useCallback} from 'react'
 import { getCldImageUrl, getCldVideoUrl } from 'next-cloudinary'
-import {Download, Clock, FileDown, FileUp, Trash2, Subtitles, Play} from 'lucide-react'
+import {Download, Clock, FileUp, FileDown, Trash2, Subtitles, Play} from 'lucide-react'
 import dayjs from 'dayjs'
 import realtivetime from 'dayjs/plugin/relativeTime'
 import {filesize} from 'filesize'
@@ -12,7 +12,7 @@ dayjs.extend(realtivetime)
 interface VideoCardProps {
     publicId: string
     video: Video;
-    onDownload: (url: string, title: string) => void;
+    onDownload: (url: string, title: string, subtitles?: string | null) => void;
     onDelete: (id: string) => void;
     onGenerateSubtitles: (videoId: string, publicId: string) => void;
     isDeleting?: boolean;
@@ -39,7 +39,7 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
           })
     },[])
 
-    const getFullVideoUrl = useCallback((publicId: string) =>{
+    const getFullVideoUrl = useCallback((publicId: string, filename?: string) =>{
           return getCldVideoUrl({
             src: publicId,
             width: 1920,
@@ -154,18 +154,22 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
                 )}
                 <button
                   className="btn btn-primary btn-sm"
-                  onClick={() =>
-                    onDownload(getFullVideoUrl(video.publicId), video.title)
-                  }
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDownload(getFullVideoUrl(video.publicId, video.title), video.title, video.subtitles);
+                  }}
                   disabled={isDeleting || isGeneratingSubtitles}
+                  title={video.hasSubtitles ? "Open video + download subtitles" : "Open video"}
                 >
                   <Download size={16} />
+                  {video.hasSubtitles && <span className="text-xs ml-1">+Sub</span>}
                 </button>
                 <button
                   className={`btn btn-sm ${video.hasSubtitles ? 'btn-success' : 'btn-secondary'}`}
                   onClick={() => onGenerateSubtitles(video.id, video.publicId)}
                   disabled={isDeleting || isGeneratingSubtitles}
-                  title={video.hasSubtitles ? 'Subtitles available' : 'Generate subtitles'}
+                  title={video.hasSubtitles ? 'Regenerate subtitles' : 'Generate subtitles'}
                 >
                   {isGeneratingSubtitles ? (
                     <span className="loading loading-spinner loading-xs"></span>
