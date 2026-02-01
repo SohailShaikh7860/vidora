@@ -58,9 +58,16 @@ const handleSubmit = async (event: React.FormEvent)=>{
 }
 
   return (
-     <div className="container mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-4">Upload Video</h1>
-          <form onSubmit={handleSubmit} className="space-y-4">
+     <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 max-w-3xl">
+          <div className="mb-8">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
+              Upload Video
+            </h1>
+            <p className="text-sm sm:text-base text-base-content/70">Share your content with Vidora</p>
+          </div>
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body p-4 sm:p-6 lg:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div>
               <label className="label">
                 <span className="label-text">Title</span>
@@ -97,12 +104,21 @@ const handleSubmit = async (event: React.FormEvent)=>{
             </div>
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn btn-primary w-full sm:w-auto sm:btn-wide text-base sm:text-lg"
               disabled={isUploading}
             >
-              {isUploading ? "Uploading..." : "Upload Video"}
+              {isUploading ? (
+                <>
+                  <span className="loading loading-spinner"></span>
+                  Uploading...
+                </>
+              ) : (
+                "Upload Video"
+              )}
             </button>
           </form>
+          </div>
+          </div>
         </div>
   )
 }

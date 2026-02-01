@@ -61,16 +61,16 @@ export default function AppLayoutClient({
             </div>
             <div className="flex-1">
               <Link href="/" onClick={handleLogoClick}>
-                <div className="btn btn-ghost normal-case text-2xl font-bold tracking-tight cursor-pointer">
-                  Vidora
+                <div className="btn btn-ghost normal-case text-xl sm:text-2xl lg:text-3xl font-black tracking-wider cursor-pointer hover:scale-105 transition-transform" style={{fontFamily: 'system-ui, -apple-system, sans-serif', letterSpacing: '0.05em'}}>
+                  V I D O R A
                 </div>
               </Link>
             </div>
-            <div className="flex-none flex items-center space-x-4">
+            <div className="flex-none flex items-center gap-2 sm:gap-4">
               {user && (
                 <>
-                  <div className="avatar">
-                    <div className="w-8 h-8 rounded-full">
+                  <div className="avatar hidden sm:block">
+                    <div className="w-8 h-8 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                       <img
                         src={user.imageUrl}
                         alt={
@@ -79,14 +79,15 @@ export default function AppLayoutClient({
                       />
                     </div>
                   </div>
-                  <span className="text-sm truncate max-w-xs lg:max-w-md">
+                  <span className="text-xs sm:text-sm truncate max-w-[100px] sm:max-w-xs lg:max-w-md hidden md:inline-block">
                     {user.username || user.emailAddresses[0].emailAddress}
                   </span>
                   <button
                     onClick={handleSignOut}
-                    className="btn btn-ghost btn-circle"
+                    className="btn btn-ghost btn-sm sm:btn-md btn-circle"
+                    title="Sign Out"
                   >
-                    <LogOutIcon className="h-6 w-6" />
+                    <LogOutIcon className="h-5 w-5 sm:h-6 sm:w-6" />
                   </button>
                 </>
               )}

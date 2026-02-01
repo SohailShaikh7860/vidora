@@ -161,14 +161,21 @@ const HomePage = () => {
     }
   return (
      <>
-      <div className="container mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-4">Videos</h1>
+      <div className="container mx-auto px-4 py-6 lg:px-6 xl:px-8">
+          <div className="mb-6 lg:mb-8">
+            <h1 className="text-3xl lg:text-4xl xl:text-5xl font-bold mb-2">
+              My Videos
+            </h1>
+            <p className="text-sm lg:text-base text-base-content/70">Manage and share your video library</p>
+          </div>
           {videos.length === 0 ? (
-            <div className="text-center text-lg text-gray-500">
-              No videos available
+            <div className="text-center py-16">
+              <div className="text-5xl lg:text-6xl mb-4">🎬</div>
+              <p className="text-lg lg:text-xl text-gray-500 mb-2">No videos available</p>
+              <p className="text-sm text-gray-400">Upload your first video to get started!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 lg:gap-6">
               {
                 videos.map((video) => (
                     <VideoCard
@@ -189,12 +196,12 @@ const HomePage = () => {
 
         {videoToDelete && (
           <div className="modal modal-open">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg">Confirm Delete</h3>
-              <p className="py-4">Are you sure you want to delete this video? This action cannot be undone.</p>
-              <div className="modal-action">
-                <button className="btn" onClick={() => setVideoToDelete(null)}>Cancel</button>
-                <button className="btn btn-error" onClick={confirmDelete}>Delete</button>
+            <div className="modal-box w-11/12 max-w-md p-6">
+              <h3 className="font-bold text-lg lg:text-xl mb-2">Confirm Delete</h3>
+              <p className="py-4 text-sm lg:text-base">Are you sure you want to delete this video? This action cannot be undone.</p>
+              <div className="modal-action flex flex-col-reverse sm:flex-row gap-3">
+                <button className="btn btn-ghost btn-md w-full sm:w-auto" onClick={() => setVideoToDelete(null)}>Cancel</button>
+                <button className="btn btn-error btn-md w-full sm:w-auto" onClick={confirmDelete}>Delete</button>
               </div>
             </div>
           </div>
@@ -203,12 +210,12 @@ const HomePage = () => {
         
         {videoToGenerateSubtitles && (
           <div className="modal modal-open">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg">Generate Subtitles</h3>
-              <p className="py-4">Generate subtitles for this video? This may take a few minutes.</p>
-              <div className="modal-action">
-                <button className="btn" onClick={() => setVideoToGenerateSubtitles(null)}>Cancel</button>
-                <button className="btn btn-primary" onClick={confirmGenerateSubtitles}>Generate</button>
+            <div className="modal-box w-11/12 max-w-md p-6">
+              <h3 className="font-bold text-lg lg:text-xl mb-2">Generate Subtitles</h3>
+              <p className="py-4 text-sm lg:text-base">Generate subtitles for this video? This may take a few minutes.</p>
+              <div className="modal-action flex flex-col-reverse sm:flex-row gap-3">
+                <button className="btn btn-ghost btn-md w-full sm:w-auto" onClick={() => setVideoToGenerateSubtitles(null)}>Cancel</button>
+                <button className="btn btn-primary btn-md w-full sm:w-auto" onClick={confirmGenerateSubtitles}>Generate</button>
               </div>
             </div>
           </div>

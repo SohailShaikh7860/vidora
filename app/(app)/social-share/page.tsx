@@ -84,13 +84,16 @@ export default function SocialShare() {
   }
 
   return (
-     <div className="container mx-auto p-4 max-w-4xl">
-          <h1 className="text-3xl font-bold mb-6 text-center">
-            Social Media Image Creator
-          </h1>
+     <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8 max-w-5xl">
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-2">
+              Social Media Creator
+            </h1>
+            <p className="text-sm sm:text-base text-base-content/70">Transform images for any platform</p>
+          </div>
 
-          <div className="card">
-            <div className="card-body">
+          <div className="card bg-base-100 shadow-xl">
+            <div className="card-body p-4 sm:p-6 lg:p-8">
               <h2 className="card-title mb-4">Upload an Image</h2>
               <div className="form-control">
                 <label className="label">

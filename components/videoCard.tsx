@@ -81,7 +81,7 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
   return (
       <>
       <div
-          className={`card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
+          className={`card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 h-full flex flex-col ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
@@ -89,7 +89,7 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
             {isHovered ? (
               previewError ? (
                 <div className="w-full h-full flex items-center justify-center bg-gray-200">
-                  <p className="text-red-500">Preview not available</p>
+                  <p className="text-sm text-red-500">Preview not available</p>
                 </div>
               ) : (
                 <video
@@ -108,39 +108,41 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
                 className="w-full h-full object-cover"
               />
             )}
-            <div className="absolute bottom-2 right-2 bg-base-100 bg-opacity-70 px-2 py-1 rounded-lg text-sm flex items-center">
+            <div className="absolute bottom-2 right-2 bg-base-100 bg-opacity-80 backdrop-blur-sm px-2 py-1 rounded-lg text-sm flex items-center">
               <Clock size={16} className="mr-1" />
               {formatDuration(Number(video.duration))}
             </div>
           </figure>
-          <div className="card-body p-4">
-            <h2 className="card-title text-lg font-bold">{video.title}</h2>
-            <p className="text-sm text-base-content opacity-70 mb-4">
+          <div className="card-body p-4 flex-1 flex flex-col">
+            <h2 className="card-title text-base lg:text-lg font-bold line-clamp-2 mb-2">{video.title}</h2>
+            <p className="text-sm text-base-content opacity-70 mb-2 line-clamp-2">
               {video.description}
             </p>
-            <p className="text-sm text-base-content opacity-70 mb-4">
+            <p className="text-xs text-base-content opacity-60 mb-3">
               Uploaded {dayjs(video.createdAt).fromNow()}
             </p>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center">
-                <FileUp size={18} className="mr-2 text-primary" />
-                <div>
-                  <div className="font-semibold">Original</div>
-                  <div>{formatSize(Number(video.OriginalSize))}</div>
+            <div className="grid grid-cols-2 gap-3 text-sm mb-3 pb-3 border-b border-base-300">
+              <div className="flex items-center gap-2">
+                <FileUp size={18} className="text-primary flex-shrink-0" />
+                <div className="min-w-0">
+                  <div className="font-semibold text-xs opacity-70">Original</div>
+                  <div className="font-medium text-xs">{formatSize(Number(video.OriginalSize))}</div>
                 </div>
               </div>
-              <div className="flex items-center">
-                <FileDown size={18} className="mr-2 text-secondary" />
-                <div>
-                  <div className="font-semibold">Compressed</div>
-                  <div>{formatSize(Number(video.compressedSize))}</div>
+              <div className="flex items-center gap-2">
+                <FileDown size={18} className="text-secondary flex-shrink-0" />
+                <div className="min-w-0">
+                  <div className="font-semibold text-xs opacity-70">Compressed</div>
+                  <div className="font-medium text-xs">{formatSize(Number(video.compressedSize))}</div>
                 </div>
               </div>
             </div>
-            <div className="flex justify-between items-center mt-4">
-              <div className="text-sm font-semibold">
-                Compression:{" "}
-                <span className="text-accent">{compressionPercentage}%</span>
+            <div className="mt-auto">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-xs font-semibold">
+                  Compression:{" "}
+                  <span className="text-accent text-sm">{compressionPercentage}%</span>
+                </div>
               </div>
               <div className="flex gap-2">
                 {video.hasSubtitles && (
@@ -153,7 +155,7 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
                   </button>
                 )}
                 <button
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-primary btn-sm flex-1"
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -167,13 +169,13 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
                 </button>
                 {!video.hasSubtitles && (
                 <button
-                  className={`btn btn-sm ${video.hasSubtitles ? 'btn-success' : 'btn-secondary'}`}
+                  className="btn btn-secondary btn-sm"
                   onClick={() => onGenerateSubtitles(video.id, video.publicId)}
                   disabled={isDeleting || isGeneratingSubtitles}
-                  title={video.hasSubtitles ? 'Regenerate subtitles' : 'Generate subtitles'}
+                  title="Generate subtitles"
                 >
                   {isGeneratingSubtitles ? (
-                    <span className="loading loading-spinner loading-xs"></span>
+                    <span className="loading loading-spinner loading-sm"></span>
                   ) : (
                     <Subtitles size={16} />
                   )}
@@ -183,9 +185,10 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
                   className="btn btn-error btn-sm"
                   onClick={() => onDelete(video.id)}
                   disabled={isDeleting || isGeneratingSubtitles}
+                  title="Delete video"
                 >
                   {isDeleting ? (
-                    <span className="loading loading-spinner loading-xs"></span>
+                    <span className="loading loading-spinner loading-sm"></span>
                   ) : (
                     <Trash2 size={16} />
                   )}
@@ -197,16 +200,16 @@ const videoCard : React.FC<VideoCardProps> = ({video, onDownload, onDelete, onGe
 
         {showVideoModal && (
           <div className="modal modal-open" onClick={() => setShowVideoModal(false)}>
-            <div className="modal-box max-w-4xl" onClick={(e) => e.stopPropagation()}>
-              <h3 className="font-bold text-lg mb-4">{video.title}</h3>
+            <div className="modal-box w-11/12 max-w-4xl p-6" onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-bold text-lg lg:text-xl mb-4 line-clamp-1">{video.title}</h3>
               <VideoPlayer
                 publicId={video.publicId}
                 title={video.title}
                 subtitleUrl={video.subtitles}
                 autoPlay={true}
               />
-              <div className="modal-action">
-                <button className="btn" onClick={() => setShowVideoModal(false)}>
+              <div className="modal-action mt-4">
+                <button className="btn btn-md" onClick={() => setShowVideoModal(false)}>
                   Close
                 </button>
               </div>
