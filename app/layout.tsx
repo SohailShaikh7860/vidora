@@ -18,6 +18,9 @@ export default function RootLayout({
       <body
       >
         {children}
+        <div id="toast" className="toast toast-top toast-end z-50">
+          
+        </div>
       </body>
     </html>
     </ClerkProvider>

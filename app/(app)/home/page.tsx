@@ -3,6 +3,7 @@ import React, {useState, useCallback, useEffect} from 'react'
 import axios from 'axios'
 import VideoCard from '@/components/videoCard'
 import {Video} from '@/types/index'
+import { ShowToast } from '@/components/toast'
 const HomePage = () => {
 
   const [videos, setVideos] = useState<Video[]>([]);
@@ -10,6 +11,8 @@ const HomePage = () => {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [generatingSubtitlesId, setGeneratingSubtitlesId] = useState<string | null>(null);
+  const [videoToDelete, setVideoToDelete] = useState<string | null>(null);
+  const [videoToGenerateSubtitles, setVideoToGenerateSubtitles] = useState<{id: string, publicId: string} | null>(null);
 
   const fetchVideos = useCallback(async () => {
       try {
@@ -20,7 +23,6 @@ const HomePage = () => {
           throw new Error("Unexpected response format");
        }
       } catch (error) {
-         console.log(error);
          setError(error instanceof Error ? error.message : String(error));
       } finally {
          setLoading(false);
@@ -32,7 +34,6 @@ const HomePage = () => {
   },[fetchVideos])
 
    const handleDownload = useCallback(async (url: string, title: string, subtitles?: string | null) => {
-        console.log('📥 Download clicked - Opening video in new tab + downloading subtitles');
         
         try {
             window.open(url, '_blank');
@@ -79,33 +80,40 @@ const HomePage = () => {
     }, [])
 
     const handleDelete = useCallback(async (id: string) => {
-        if (!confirm('Are you sure you want to delete this video?')) {
-            return;
-        }
+        setVideoToDelete(id);
+    }, [])
 
-        setDeletingId(id);
+    const confirmDelete = useCallback(async () => {
+        if (!videoToDelete) return;
+
+        setDeletingId(videoToDelete);
+        setVideoToDelete(null);
 
         try {
-            const response = await axios.delete(`/api/video-delete?id=${id}`);
+            const response = await axios.delete(`/api/video-delete?id=${videoToDelete}`);
             
             if (response.data.success) {
-                setVideos(prevVideos => prevVideos.filter(video => video.id !== id));
-                alert('Video deleted successfully!');
+                setVideos(prevVideos => prevVideos.filter(video => video.id !== videoToDelete));
+                ShowToast('Video deleted successfully!', 'success');
             }
         } catch (error) {
             console.error('Delete error:', error);
-            alert('Failed to delete video. Please try again.');
+            ShowToast('Failed to delete video. Please try again.', 'error');
         } finally {
             setDeletingId(null);
         }
-    }, [])
+    }, [videoToDelete])
 
     const handleGenerateSubtitles = useCallback(async (videoId: string, publicId: string) => {
-        if (!confirm('Generate subtitles for this video? This may take a few minutes.')) {
-            return;
-        }
+        setVideoToGenerateSubtitles({id: videoId, publicId});
+    }, [])
 
+    const confirmGenerateSubtitles = useCallback(async () => {
+        if (!videoToGenerateSubtitles) return;
+
+        const {id: videoId, publicId} = videoToGenerateSubtitles;
         setGeneratingSubtitlesId(videoId);
+        setVideoToGenerateSubtitles(null);
 
         try {
             const response = await axios.post('/api/subtitle-generator', {
@@ -123,21 +131,22 @@ const HomePage = () => {
                     )
                 );
 
-                alert('Subtitles generated successfully!');
+                ShowToast('Subtitles generated successfully!', 'success');
             }
         } catch (error) {
             console.error('Subtitle generation error:', error);
-            alert('Failed to generate subtitles. Please try again.');
+            ShowToast('Failed to generate subtitles. Please try again.', 'error');
         } finally {
             setGeneratingSubtitlesId(null);
         }
-    }, [])
+    }, [videoToGenerateSubtitles])
 
     if(loading){
         return <div>Loading...</div>
     }
   return (
-     <div className="container mx-auto p-4">
+     <>
+      <div className="container mx-auto p-4">
           <h1 className="text-2xl font-bold mb-4">Videos</h1>
           {videos.length === 0 ? (
             <div className="text-center text-lg text-gray-500">
@@ -162,6 +171,34 @@ const HomePage = () => {
             </div>
           )}
         </div>
+
+        {videoToDelete && (
+          <div className="modal modal-open">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Confirm Delete</h3>
+              <p className="py-4">Are you sure you want to delete this video? This action cannot be undone.</p>
+              <div className="modal-action">
+                <button className="btn" onClick={() => setVideoToDelete(null)}>Cancel</button>
+                <button className="btn btn-error" onClick={confirmDelete}>Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        
+        {videoToGenerateSubtitles && (
+          <div className="modal modal-open">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Generate Subtitles</h3>
+              <p className="py-4">Generate subtitles for this video? This may take a few minutes.</p>
+              <div className="modal-action">
+                <button className="btn" onClick={() => setVideoToGenerateSubtitles(null)}>Cancel</button>
+                <button className="btn btn-primary" onClick={confirmGenerateSubtitles}>Generate</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
   )
 }
 

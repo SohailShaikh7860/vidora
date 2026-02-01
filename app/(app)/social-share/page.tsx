@@ -1,6 +1,7 @@
 "use client"
 import React, {useState, useEffect, useRef} from 'react'
 import { CldImage } from 'next-cloudinary';
+import { ShowToast } from '@/components/toast';
 
 
 const socialFrames = {
@@ -46,12 +47,12 @@ export default function SocialShare() {
       if(response.ok){
         const data = await response.json();
         setUploadedImage(data.publicId);
+        ShowToast("Image uploaded successfully", "success");
       }else{
-        console.error("Upload failed");
+        ShowToast("Upload failed", "error");
       }
     } catch (error) {
-       console.log("Error uploading image", error);
-       alert("Error uploading image");
+       ShowToast("Error uploading image", "error");
     }finally{
       setIsUploading(false);
     }

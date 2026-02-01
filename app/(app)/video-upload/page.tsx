@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation';
+import { ShowToast } from '@/components/toast';
 
 
 const page = () => {
@@ -20,12 +21,12 @@ const handleSubmit = async (event: React.FormEvent)=>{
        event.preventDefault();
 
        if(!file){
-          alert("Please select a file");
+          ShowToast("Please select a file", "error");
           return;
        }
 
        if(file.size > MAX_FILE_SIZE){
-          alert("File size exceeds 70MB limit");
+          ShowToast("File size exceeds 70MB limit", "error");
           return;
        }
 
@@ -40,14 +41,14 @@ const handleSubmit = async (event: React.FormEvent)=>{
          const res =  await axios.post('/api/video-upload', formData);
 
           if(res.status === 200){
-             alert("Video uploaded successfully");
+             ShowToast("Video uploaded successfully", "success");
              router.push('/home');
           }else{
-              alert("Video upload failed");
+              ShowToast("Video upload failed", "error");
           }
 
         } catch (error:any) {
-          console.log("Error uploading video", error.message);
+          throw new Error(error.message);
         }finally{
           setIsUploading(false);
         }
