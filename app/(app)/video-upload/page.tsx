@@ -15,7 +15,7 @@ const page = () => {
 
   const router = useRouter();
 
-const MAX_FILE_SIZE = 70 * 1024 * 1024; // 70MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
 
 const handleSubmit = async (event: React.FormEvent)=>{
        event.preventDefault();
@@ -26,19 +26,41 @@ const handleSubmit = async (event: React.FormEvent)=>{
        }
 
        if(file.size > MAX_FILE_SIZE){
-          ShowToast("File size exceeds 70MB limit", "error");
+          ShowToast("File size exceeds 100MB limit", "error");
           return;
        }
 
        setIsUploading(true);
-       const formData = new FormData();
-        formData.append("file", file);
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("originalSize", file.size.toString());
 
         try {
-         const res =  await axios.post('/api/video-upload', formData);
+         const signatureResponse = await axios.post('/api/cloudinary-signature');
+         const { signature, timestamp, cloudName, apiKey, folder, transformation } = signatureResponse.data;
+
+         const formData = new FormData();
+         formData.append("file", file);
+         formData.append("signature", signature);
+         formData.append("timestamp", timestamp.toString());
+         formData.append("api_key", apiKey);
+         formData.append("folder", folder);
+         formData.append("transformation", transformation);
+
+         const cloudinaryResponse = await axios.post(
+           `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+           formData
+         );
+
+         const videoData = {
+           title,
+           description,
+           publicId: cloudinaryResponse.data.public_id,
+           originalSize: file.size.toString(),
+           compressedSize: cloudinaryResponse.data.bytes.toString(),
+           duration: (cloudinaryResponse.data.duration || 0).toString(),
+         };
+
+         const res = await axios.post('/api/video-upload', videoData, {
+           headers: { 'Content-Type': 'application/json' }
+         });
 
           if(res.status === 200){
              ShowToast("Video uploaded successfully", "success");
