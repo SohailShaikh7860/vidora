@@ -156,18 +156,18 @@ export default function Home() {
           {[
             {
               num: "01",
-              title: "Upload your file",
-              desc: "Video or image. Drag and drop or click to browse. That\u2019s it.",
+              title: "Upload your media",
+              desc: "Drag and drop videos (up to 100MB) or images. Instant Cloudinary storage.",
             },
             {
               num: "02",
-              title: "We do the heavy lifting",
-              desc: "AI transcription, format detection, compression \u2014 all automatic.",
+              title: "AI processes automatically",
+              desc: "Generate subtitles with OpenAI Whisper, optimize formats, and compress.",
             },
             {
               num: "03",
-              title: "Download or share",
-              desc: "Grab the output, or push directly to your social accounts.",
+              title: "Share or download",
+              desc: "Get shareable links, download processed files, or embed on social platforms.",
             },
           ].map((step, i) => (
             <div
