@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { v2 as cloudinary } from "cloudinary";
+import { auth } from "@clerk/nextjs/server";
 
 
 cloudinary.config({
@@ -20,6 +21,12 @@ const prisma = new PrismaClient({ adapter });
 
 export async function DELETE(request: NextRequest) {
     try {
+        const { userId } = await auth();
+        
+        if (!userId) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
         if (!id) {
@@ -33,6 +40,10 @@ export async function DELETE(request: NextRequest) {
 
         if (!video) {
             return NextResponse.json({ error: 'Video not found' }, { status: 404 });
+        }
+
+        if (video.userId !== userId) {
+            return NextResponse.json({ error: 'Forbidden: You can only delete your own videos' }, { status: 403 });
         }
 
         

@@ -4,6 +4,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 import { v2 as cloudinary } from "cloudinary";
+import { auth } from "@clerk/nextjs/server";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -22,12 +23,33 @@ const prisma = new PrismaClient({ adapter });
 export async function POST(request: NextRequest) {
   
   try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { videoId, publicId } = await request.json();
 
     if (!videoId || !publicId) {
       return NextResponse.json(
         { error: "Video ID and Public ID are required" },
         { status: 400 }
+      );
+    }
+
+    const video = await prisma.video.findUnique({
+      where: { id: videoId }
+    });
+
+    if (!video) {
+      return NextResponse.json({ error: "Video not found" }, { status: 404 });
+    }
+
+    if (video.userId !== userId) {
+      return NextResponse.json(
+        { error: "Forbidden: You can only generate subtitles for your own videos" },
+        { status: 403 }
       );
     }
 

@@ -22,7 +22,10 @@ model Video {
   duration       String
   subtitles      String?  @db.Text  
   hasSubtitles   Boolean  @default(false)
-  subtitleFormat String?  
+  subtitleFormat String?
+  userId         String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  
+  @@index([userId])
 }

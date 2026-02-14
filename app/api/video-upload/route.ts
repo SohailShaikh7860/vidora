@@ -36,6 +36,12 @@ interface CloudinaryUploadResult {
 
 export async function POST(request: Request) {
   try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { title, description, publicId, originalSize, compressedSize, duration } = body;
 
@@ -51,6 +57,7 @@ export async function POST(request: Request) {
             OriginalSize: originalSize,
             compressedSize,
             duration,
+            userId,
         }
     })
 
