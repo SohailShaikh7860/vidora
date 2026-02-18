@@ -25,6 +25,7 @@ export default function AppLayoutClient({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { signOut } = useClerk();
@@ -35,7 +36,12 @@ export default function AppLayoutClient({
   };
 
   const handleSignOut = async () => {
-    await signOut();
+    setIsLoggingOut(true);
+    try {
+      await signOut();
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -86,15 +92,20 @@ export default function AppLayoutClient({
                     onClick={handleSignOut}
                     className="btn btn-ghost btn-sm sm:btn-md btn-circle"
                     title="Sign Out"
+                    disabled={isLoggingOut}
                   >
-                    <LogOutIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                    {isLoggingOut ? (
+                      <span className="loading loading-spinner loading-md"></span>
+                    ) : (
+                      <LogOutIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                    )}
                   </button>
                 </>
               )}
             </div>
           </div>
         </header>
-        {/* Page content */}
+        
         <main className="grow">
           <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 my-8">
             {children}
@@ -130,8 +141,13 @@ export default function AppLayoutClient({
               <button
                 onClick={handleSignOut}
                 className="btn btn-outline btn-error w-full"
+                disabled={isLoggingOut}
               >
-                <LogOutIcon className="mr-2 h-5 w-5" />
+                {isLoggingOut ? (
+                  <span className="loading loading-spinner loading-md"></span>
+                ) : (
+                  <LogOutIcon className="mr-2 h-5 w-5" />
+                )}
                 Sign Out
               </button>
             </div>
