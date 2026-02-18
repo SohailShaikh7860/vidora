@@ -9,13 +9,13 @@ A full-stack video management platform with AI-powered subtitle generation and a
 ## Screenshots
 
 ### Dashboard
-![Dashboard](public/images/DashBoard.png)
+![Dashboard](public/Images/DashBoard.png)
 
 ### Social Share
-![Social Share Page](public/images/SocailPage.png)
+![Social Share Page](public/Images/SocailPage.png)
 
 ### Video Upload
-![Upload Page](public/images/UploadPage.png)
+![Upload Page](public/Images/UploadPage.png)
 
 ## Features
 
