@@ -6,6 +6,17 @@ A full-stack video management platform with AI-powered subtitle generation and a
 
 [View Live App](https://cloudinary-saas.vercel.app/)
 
+## Screenshots
+
+### Dashboard
+![Dashboard](public/images/DashBoard.png)
+
+### Social Share
+![Social Share Page](public/images/SocailPage.png)
+
+### Video Upload
+![Upload Page](public/images/UploadPage.png)
+
 ## Features
 
 - Video upload with automatic compression and optimization
@@ -39,8 +50,8 @@ A full-stack video management platform with AI-powered subtitle generation and a
 
 1. Clone the repository
 ```bash
-git clone https://github.com/SohailShaikh7860/cloudinary-saas.git
-cd cloudinary-saas
+git clone https://github.com/SohailShaikh7860/vidora.git
+cd vidora
 ```
 
 2. Install dependencies
