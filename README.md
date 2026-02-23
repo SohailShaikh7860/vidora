@@ -4,7 +4,8 @@ A full-stack video management platform with AI-powered subtitle generation and a
 
 ## Live Demo
 
-[View Live App](https://cloudinary-saas.vercel.app/)
+[View Live App](https://cloudinary-saas.vercel.app/)  
+[Watch Demo Video](https://youtu.be/3JUyVl4bXAA)
 
 ## Screenshots
 
